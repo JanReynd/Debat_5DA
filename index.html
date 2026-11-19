@@ -1633,8 +1633,10 @@ function closeTeacher(){ $("#teacher").classList.remove("show"); document.body.s
 
 /* ================= NAV ================= */
 function initNav(){
-  const links=$$(".navlinks a"); const map={}; links.forEach(a=>map[a.getAttribute("href").slice(1)]=a);
-  const io=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ links.forEach(l=>l.classList.remove("active")); const a=map[e.target.id]; if(a){ a.classList.add("active"); a.scrollIntoView({block:"nearest",inline:"center"}); } } }); },{rootMargin:"-45% 0px -50% 0px"});
+  const nav=$(".navlinks"); const links=$$(".navlinks a"); const map={}; links.forEach(a=>map[a.getAttribute("href").slice(1)]=a);
+  // Only scroll the nav bar horizontally; never the page itself (scrollIntoView interrupted page scrolling).
+  const centerLink=a=>{ const left=a.offsetLeft - nav.offsetLeft - (nav.clientWidth - a.offsetWidth)/2; nav.scrollLeft = Math.max(0,left); };
+  const io=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ links.forEach(l=>l.classList.remove("active")); const a=map[e.target.id]; if(a){ a.classList.add("active"); centerLink(a); } } }); },{rootMargin:"-45% 0px -50% 0px"});
   Object.keys(map).forEach(id=>{ const s=document.getElementById(id); if(s) io.observe(s); });
   document.addEventListener("click",e=>{ const a=e.target.closest("[data-open]"); if(a){ e.preventDefault(); openEx(a.dataset.open); } });
 }
